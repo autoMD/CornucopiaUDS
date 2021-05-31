@@ -24,7 +24,7 @@ let package: Package = Package(
     ],
     targets: [
         .target(name: "CornucopiaUDS", dependencies: ["CornucopiaCore"]),
-        .target(name: "Example", dependencies: [
+        .executableTarget(name: "Example", dependencies: [
             "CornucopiaUDS",
             "CornucopiaStreams",
             .product(name: "ArgumentParser", package: "swift-argument-parser")
