@@ -11,9 +11,9 @@ public extension UDS {
         public typealias TypedResult<SuccessfulResponseType> = Result<SuccessfulResponseType, UDS.Error>
         public typealias TypedResultHandler<SuccessfulResponseType> = (TypedResult<SuccessfulResponseType>) -> ()
 
-        let id: UDS.Header
-        let reply: UDS.Header
-        let pipeline: UDS.Pipeline
+        public let id: UDS.Header
+        public let reply: UDS.Header
+        public let pipeline: UDS.Pipeline
 
         public var activeTransferProgress: Progress?
 
@@ -86,8 +86,10 @@ public extension UDS {
     }
 }
 
-internal extension UDS.DiagnosticSession {
+//MARK:- Private
+private extension UDS.DiagnosticSession {
 
+    /// Sends a service, expecting a certain result handler.
     func request<T: UDS.ConstructableViaMessage>(service: UDS.Service, then: @escaping(TypedResultHandler<T>)) {
         self.pipeline.send(to: self.id, reply: self.reply, service: service) { result in
 
@@ -107,11 +109,13 @@ internal extension UDS.DiagnosticSession {
         }
     }
 
+    /// Transfer the _next_ block during a UDS data transfer.
     func transferNextBlock(_ block: UInt8, chunkSize: Int, remainingData: Data, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
 
         let chunk = remainingData.prefix(chunkSize)
         self.transferBlock(block, data: chunk) { result in
             guard case .success(_) = result else {
+                //FIXME: Implement (configurable) retry mechanism
                 self.activeTransferProgress = nil
                 then(result)
                 return
