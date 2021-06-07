@@ -23,9 +23,21 @@ public extension UDS {
             self.pipeline = via
         }
 
+        //MARK:- Direct UDS Requests
+
         /// Clear stored diagnostic trouble codes
         public func clearDiagnosticInformation(groupOfDTC: GroupOfDTC, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.request(service: .clearDiagnosticInformation(groupOfDTC: groupOfDTC), then: then)
+        }
+
+        /// Clear dynamically defined data identifier
+        public func clearDynamicallyDefinedDataIdentifier(_ identifier: DataIdentifier, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
+            self.request(service: .clearDynamicallyDefinedDataIdentifier(id: identifier), then: then)
+        }
+
+        /// Define dynamically defined data identifier by identifier
+        public func dynamicallyDefineIdentifier(_ identifier: DataIdentifier, byIdentifier: DataIdentifier, position: PositionInRecord, length: MemorySize, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
+            self.request(service: .dynamicallyDefineDataIdentifier(id: identifier, byIdentifier: byIdentifier, position: position, length: length), then: then)
         }
 
         /// Reset the ECU
@@ -53,11 +65,6 @@ public extension UDS {
             self.request(service: .readDataByIdentifier(id: byIdentifier), then: then)
         }
 
-        /// Write data record
-        public func writeData(byIdentifier: UDS.DataIdentifier, dataRecord: DataRecord, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
-            self.request(service: .writeDataByIdentifier(id: byIdentifier, drec: dataRecord), then: then)
-        }
-
         /// Initiate a block transfer (TESTER -> ECU)
         public func requestDownload(compression: UInt8, encryption: UInt8, address: [UInt8], length: [UInt8], then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.request(service: .requestDownload(compression: compression, encryption: encryption, address: address, length: length), then: then)
@@ -68,7 +75,8 @@ public extension UDS {
             self.request(service: .routineControl(type: type, id: identifier, rcor: optionRecord), then: then)
         }
 
-        /// Transfer a single data block. The maximum data length is adapter-specific.
+        /// Transfer a single data block. Caution: The maximum data length is adapter-specific. The use
+        /// of this function is not recommended, unless you know exactly what you are doing. Better use `transferData`!
         public func transferBlock(_ block: UInt8, data: Data, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.request(service: .transferData(bsc: block, trpr: [UInt8](data)), then: then)
         }
@@ -78,11 +86,25 @@ public extension UDS {
             self.request(service: .requestTransferExit(trpr: optionRecord), then: then)
         }
 
-        /// Higher level data transfer
+        /// Write data record
+        public func writeData(byIdentifier: UDS.DataIdentifier, dataRecord: DataRecord, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
+            self.request(service: .writeDataByIdentifier(id: byIdentifier, drec: dataRecord), then: then)
+        }
+
+        //MARK:- Aggregated / Higher Level features
+
+        /// Send data via consecutive block transfer
         public func transferData(_ data: Data, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.activeTransferProgress = .init(totalUnitCount: Int64(data.count))
             self.transferNextBlock(1, chunkSize: self.pipeline.adapter.mtu - 2, remainingData: data, then: then)
         }
+
+        /// Register a number of dynamically defined data identifiers given the source identifiers
+        /// Returns the dynamic identifiers
+        public func defineDynamicIdentifiers(sourceIdentifiers: [DataIdentifier], then: @escaping([DataIdentifier] -> ())) {
+            /// todo
+        }
+
     }
 }
 

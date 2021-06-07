@@ -339,6 +339,14 @@ extension UDS {
         public let seed: [UInt8]
     }
 
+    // Service 0x2C – Dynamically Define Data Identifier
+    public enum DynamicallyDefineDataIdentifierDefinitionType: UInt8 {
+
+        case defineByIdentifier                         = 0x01
+        case defineByMemoryAddress                      = 0x02
+        case clear                                      = 0x03
+    }
+
     // Service 0x31 – Routine Control
     public enum RoutineControlType: UInt8 {
 

@@ -14,7 +14,9 @@ public extension UDS {
     typealias Encryption = UInt8 // actually, just a nibble
     typealias GroupOfDTC = UInt32 // actually, just two or three bytes
     typealias Header = UInt32
-    typealias ParameterId = UInt8
+    typealias MemorySize = UInt8 // 0x01 - 0xFF, in reality a lot less though
+    typealias ParameterId = UInt8 // 0x01 - 0xFF, in reality a lot less though
+    typealias PositionInRecord = UInt8
     typealias RoutineIdentifier = UInt16
     typealias RoutineControlOptionRecord = [UInt8]
     typealias SecurityLevel = UInt8
@@ -43,6 +45,8 @@ public extension UDS {
 
         // Unified Diagnostic Services (UDS)
         case clearDiagnosticInformation(groupOfDTC: GroupOfDTC)
+        case clearDynamicallyDefinedDataIdentifier(id: DataIdentifier)
+        case dynamicallyDefineDataIdentifier(id: DataIdentifier, byIdentifier: DataIdentifier, position: PositionInRecord, length: MemorySize)
         case diagnosticSessionControl(session: DiagnosticSessionType)
         case ecuReset(type: EcuResetType)
         case readDataByIdentifier(id: DataIdentifier)
@@ -90,9 +94,21 @@ public extension UDS {
                     return [UDS.ServiceId.vehicleInformation, pid]
 
                 // Unified Diagnostic Services (UDS)
-                case .clearDiagnosticInformation(groupOfDTC: let group):
+                case .clearDiagnosticInformation(let group):
                     let (_, msblo, lsbhi, lsblo) = group.CC_UInt8tuple
                     return [UDS.ServiceId.clearDiagnosticInformation, msblo, lsbhi, lsblo]
+
+                case .clearDynamicallyDefinedDataIdentifier(let id):
+                    let idhi = UInt8(id >> 8 & 0xff)
+                    let idlo = UInt8(id & 0xff)
+                    return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.clear.rawValue, idhi, idlo]
+
+                case .dynamicallyDefineDataIdentifier(let id, let sourceId, let position, let length):
+                    let idhi = UInt8(id >> 8 & 0xff)
+                    let idlo = UInt8(id & 0xff)
+                    let sourceidhi = UInt8(sourceId >> 8 & 0xff)
+                    let sourceidlo = UInt8(sourceId & 0xff)
+                    return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.defineByIdentifier.rawValue, idhi, idlo, position, length, sourceidhi, sourceidlo]
 
                 case .diagnosticSessionControl(session: let session):
                     return [UDS.ServiceId.diagnosticSessionControl, session.rawValue]
