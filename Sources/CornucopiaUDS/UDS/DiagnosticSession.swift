@@ -100,8 +100,8 @@ public extension UDS {
         }
 
         /// Register a number of dynamically defined data identifiers given the source identifiers
-        /// Returns the dynamic identifiers
-        public func defineDynamicIdentifiers(sourceIdentifiers: [DataIdentifier], then: @escaping([DataIdentifier] -> ())) {
+        /// Returns the dynamic identifiers.
+        public func defineDynamicIdentifiers(sourceIdentifiers: [DataIdentifier], then: @escaping(([DataIdentifier]) -> ())) {
             /// todo
         }
 
