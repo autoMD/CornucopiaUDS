@@ -72,6 +72,9 @@ public extension UDS {
         public func send(message: UDS.Message, expectedResponses: Int? = nil, then: @escaping(MessageResultHandler)) {
             fatalError("pure virtual")
         }
+        public func shutdown() {
+            fatalError("pure virtual")
+        }
     }
 }
 
