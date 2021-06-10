@@ -211,6 +211,11 @@ public extension UDS {
                     break
             }
         }
+
+        public override func shutdown() {
+            self.updateState(.gone)
+            self.commandQueue.cleanup()
+        }
     }
 }
 
