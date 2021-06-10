@@ -93,10 +93,23 @@ public class StreamCommandQueue: NSObject, StreamDelegate {
 
     public func flush() {
         //FIXME: Don't remove remaining commands on `flush()`
-        logger.info("Flushing…")
+        logger.debug("Flushing…")
         self.active = nil
         self.pending = []
-        logger.info("Flushing complete!")
+        logger.debug("Flushing complete!")
+    }
+
+    public func cleanup() {
+        logger.debug("Cleaning up…")
+        if self.input.streamStatus != .closed {
+            self.input.remove(from: RunLoop.current, forMode: .default)
+            self.input.close()
+        }
+        if self.output.streamStatus != .closed {
+            self.output.remove(from: RunLoop.current, forMode: .default)
+            self.output.close()
+        }
+        logger.debug("Cleaned up!")
     }
 
     //MARK: - <StreamDelegate>
@@ -153,13 +166,6 @@ public class StreamCommandQueue: NSObject, StreamDelegate {
 private extension StreamCommandQueue {
 
     static var BufferSize = 1024
-
-    func cleanup() {
-        self.input.remove(from: RunLoop.current, forMode: .default)
-        self.input.close()
-        self.output.remove(from: RunLoop.current, forMode: .default)
-        self.output.close()
-    }
 
     func installMock(request: String, response: String) {
         self.mocks[request] = response
