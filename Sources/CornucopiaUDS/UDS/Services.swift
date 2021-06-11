@@ -45,6 +45,7 @@ public extension UDS {
 
         // Unified Diagnostic Services (UDS)
         case clearDiagnosticInformation(groupOfDTC: GroupOfDTC)
+        case clearAllDynamicallyDefinedDataIdentifiers
         case clearDynamicallyDefinedDataIdentifier(id: DataIdentifier)
         case dynamicallyDefineDataIdentifier(id: DataIdentifier, byIdentifier: DataIdentifier, position: PositionInRecord, length: MemorySize)
         case diagnosticSessionControl(session: DiagnosticSessionType)
@@ -103,12 +104,15 @@ public extension UDS {
                     let idlo = UInt8(id & 0xff)
                     return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.clear.rawValue, idhi, idlo]
 
+                case .clearAllDynamicallyDefinedDataIdentifiers:
+                    return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.clear.rawValue]
+
                 case .dynamicallyDefineDataIdentifier(let id, let sourceId, let position, let length):
                     let idhi = UInt8(id >> 8 & 0xff)
                     let idlo = UInt8(id & 0xff)
                     let sourceidhi = UInt8(sourceId >> 8 & 0xff)
                     let sourceidlo = UInt8(sourceId & 0xff)
-                    return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.defineByIdentifier.rawValue, idhi, idlo, position, length, sourceidhi, sourceidlo]
+                    return [UDS.ServiceId.dynamicallyDefineDataIdentifier, UDS.DynamicallyDefineDataIdentifierDefinitionType.defineByIdentifier.rawValue, idhi, idlo, sourceidhi, sourceidlo, position, length]
 
                 case .diagnosticSessionControl(session: let session):
                     return [UDS.ServiceId.diagnosticSessionControl, session.rawValue]

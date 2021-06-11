@@ -30,7 +30,12 @@ public extension UDS {
             self.request(service: .clearDiagnosticInformation(groupOfDTC: groupOfDTC), then: then)
         }
 
-        /// Clear dynamically defined data identifier
+        /// Clear all dynamically defined data identifiers
+        public func clearAllDynamicallyDefinedDataIdentifiers(then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
+            self.request(service: .clearAllDynamicallyDefinedDataIdentifiers, then: then)
+        }
+
+        /// Clear a dynamically defined data identifier
         public func clearDynamicallyDefinedDataIdentifier(_ identifier: DataIdentifier, then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.request(service: .clearDynamicallyDefinedDataIdentifier(id: identifier), then: then)
         }
@@ -99,12 +104,36 @@ public extension UDS {
             self.transferNextBlock(1, chunkSize: self.pipeline.adapter.mtu - 2, remainingData: data, then: then)
         }
 
-        /// Register a number of dynamically defined data identifiers given the source identifiers
+        /// Register a number of dynamically defined data identifiers given the source identifiers.
+        /// This call tries to read the source identifier first, to gather its presence and length.
         /// Returns the dynamic identifiers.
         public func defineDynamicIdentifiers(sourceIdentifiers: [DataIdentifier], then: @escaping(([DataIdentifier]) -> ())) {
-            /// todo
-        }
 
+            func defineNextDynamicDataIdentifier(sourceIdentifiers: [DataIdentifier], destIdentifiers: [DataIdentifier], then: @escaping(([DataIdentifier]) -> ())) {
+
+                let destIdentifier = destIdentifiers.last!
+
+                guard let nextSourceIdentifier = sourceIdentifiers.first else { return then(destIdentifiers) }
+                self.readData(byIdentifier: nextSourceIdentifier) { readResponse in
+                    guard case let .success(identifierResponse) = readResponse else {
+                        print("Can't read \(nextSourceIdentifier): \(readResponse)")
+                        defineNextDynamicDataIdentifier(sourceIdentifiers: Array(sourceIdentifiers.dropFirst()), destIdentifiers: destIdentifiers, then: then)
+                        return
+                    }
+                    let length = UInt8(min(0xFF, identifierResponse.dataRecord.count))
+                    self.dynamicallyDefineIdentifier(destIdentifier, byIdentifier: nextSourceIdentifier, position: 1, length: length) { addResponse in
+                        guard case .success = addResponse else {
+                            print("Can't add \(nextSourceIdentifier) to \(destIdentifier): \(addResponse)")
+                            let nextDestIdentifiers = destIdentifiers + [destIdentifier + 1]
+                            defineNextDynamicDataIdentifier(sourceIdentifiers: sourceIdentifiers, destIdentifiers: nextDestIdentifiers, then: then)
+                            return
+                        }
+                        defineNextDynamicDataIdentifier(sourceIdentifiers: Array(sourceIdentifiers.dropFirst()), destIdentifiers: destIdentifiers, then: then)
+                    }
+                }
+            }
+            defineNextDynamicDataIdentifier(sourceIdentifiers: sourceIdentifiers, destIdentifiers: [0xF300], then: then)
+        }
     }
 }
 
