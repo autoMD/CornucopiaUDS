@@ -1,5 +1,9 @@
 # TODO
 
+## Very Short Term
+
+- [ ] Guard protocol decoder against invalid inputs
+
 ## Short Term
 
 - [ ] Implement the missing bus protocols
