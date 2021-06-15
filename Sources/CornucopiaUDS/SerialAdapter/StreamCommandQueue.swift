@@ -100,6 +100,7 @@ public class StreamCommandQueue: NSObject, StreamDelegate {
     }
 
     public func cleanup() {
+        //FIXME: If there is an active command, cancel it?
         logger.debug("Cleaning up…")
         if self.input.streamStatus != .closed {
             self.input.remove(from: RunLoop.current, forMode: .default)
