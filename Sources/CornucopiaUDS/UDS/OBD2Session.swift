@@ -18,7 +18,7 @@ public extension UDS {
             self.adapter = adapter
         }
 
-        public func readDTCs(storage: UDS.DTC.StorageArea, then: @escaping(TypedResultHandler<DTCResponse>)) {
+        public func readDTCs(storage: UDS.OBD2.DTC.StorageArea, then: @escaping(TypedResultHandler<OBD2DTCResponse>)) {
             self.request(service: storage.service, then: then)
         }
 

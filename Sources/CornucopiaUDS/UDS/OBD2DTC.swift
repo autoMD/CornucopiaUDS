@@ -3,7 +3,7 @@
 //
 import CornucopiaCore
 
-public extension UDS {
+public extension UDS.OBD2 {
 
     /// A Diagnostic Trouble Code (DTC) as defined by ISO 15031-6/SAE J2012-2007
     struct DTC: CustomStringConvertible, RawRepresentable {
@@ -92,17 +92,17 @@ public extension UDS {
     }
 }
 
-public extension UDS.DTC {
+public extension UDS.OBD2.DTC {
 
     @propertyWrapper
     struct Stringified: Codable {
 
-        public let wrappedValue: UDS.DTC
+        public let wrappedValue: UDS.OBD2.DTC
 
         public init(from decoder: Decoder) throws {
             let container = try decoder.singleValueContainer()
             let string = try container.decode(String.self)
-            guard let dtc = UDS.DTC(rawValue: string) else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "'\(string)' is not a valid DTC") }
+            guard let dtc = UDS.OBD2.DTC(rawValue: string) else { throw DecodingError.dataCorruptedError(in: container, debugDescription: "'\(string)' is not a valid DTC") }
             self.wrappedValue = dtc
         }
 
@@ -111,7 +111,7 @@ public extension UDS.DTC {
             try container.encode(self.wrappedValue.rawValue)
         }
 
-        public init(wrappedValue: UDS.DTC) {
+        public init(wrappedValue: UDS.OBD2.DTC) {
             self.wrappedValue = wrappedValue
         }
     }

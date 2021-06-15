@@ -82,9 +82,9 @@ extension UDS {
     }
 
     /// DTC Response: Responses containing one or more diagnostic trouble codes
-    public struct DTCResponse: ConstructableViaMessage, CustomStringConvertible {
+    public struct OBD2DTCResponse: ConstructableViaMessage, CustomStringConvertible {
 
-        public let dtc: [UDS.DTC]
+        public let dtc: [UDS.OBD2.DTC]
 
         public init(message: UDS.Message) {
             guard message.bytes.count > 1 else { fatalError() }
@@ -95,7 +95,7 @@ extension UDS {
              we just check whether the length of the result is odd (non-CAN) or even (CAN).
              */
             let dtcStartOffset = message.bytes.count.CC_parity == .odd ? 1 : 2
-            self.dtc = message.bytes[dtcStartOffset...].CC_chunked(size: 2).map { UDS.DTC(from: $0) }
+            self.dtc = message.bytes[dtcStartOffset...].CC_chunked(size: 2).map { UDS.OBD2.DTC(from: $0) }
         }
 
         public var description: String { "DTCResponse: \(dtc)" }
@@ -304,6 +304,35 @@ extension UDS {
             }
             self.powerDownTime = TimeInterval(message.bytes[2])
         }
+    }
+
+    // Service 0x19 – Read DTC Information
+    public enum ReadDTCReportType: UInt8 {
+
+        case reportNumberOfDTCByStatusMask                      = 0x01
+        case reportDTCByStatusMask                              = 0x02
+        case reportDTCSnapshotIdentification                    = 0x03
+        case reportDTCSnapshotRecordByDTCNumber                 = 0x04
+        case reportDTCStoredDataByRecordNumber                  = 0x05
+        case reportDTCExtDataRecordByDTCNumber                  = 0x06
+        case reportNumberOfDTCBySeverityMaskRecord              = 0x07
+        case reportDTCBySeverityMaskRecord                      = 0x08
+        case reportSeverityInformationOfDTC                     = 0x09
+        case reportSupportedDTC                                 = 0x0A
+        case reportFirstTestFailedDTC                           = 0x0B
+        case reportFirstConfirmedDTC                            = 0x0C
+        case reportMostRecentTestFailedDTC                      = 0x0D
+        case reportMostRecentConfirmedDTC                       = 0x0E
+        case reportDTCFaultDetectionCounter                     = 0x14
+        case reportDTCWithPermanentStatus                       = 0x15
+        case reportDTCExtDataRecordByRecordNumber               = 0x16
+        case reportDTCUserDefMemoryDTCByStatusMask              = 0x17
+        case reportUserDefMemoryDTCSnapshotRecordByDTCNUmber    = 0x18
+        case reportUserDefMemoryDTCExtDataRecordByDTCNumber     = 0x19
+        case reportDTCExtendedDataRecordIdneitification         = 0x1A
+        case reportWWHOBDDTCByMaskRecord                        = 0x42
+        case reportWWHOBDDTCWithPermanentStatus                 = 0x55
+        case reportDTCInformationByDTCReadinessGroupIdentifier  = 0x56
     }
 
     // Service 0x22 – Read Data By Identifier
