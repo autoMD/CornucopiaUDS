@@ -32,14 +32,14 @@ public extension UDS {
 
         public struct SeverityMask: OptionSet {
 
-            static let class0            = Self(rawValue: 1 << 0)
-            static let class1            = Self(rawValue: 1 << 1)
-            static let class2            = Self(rawValue: 1 << 2)
-            static let class3            = Self(rawValue: 1 << 3)
-            static let class4            = Self(rawValue: 1 << 4)
-            static let maintenanceOnly   = Self(rawValue: 1 << 5)
-            static let checkAtNextHalt   = Self(rawValue: 1 << 6)
-            static let checkImmediately  = Self(rawValue: 1 << 7)
+            public static let class0            = Self(rawValue: 1 << 0)
+            public static let class1            = Self(rawValue: 1 << 1)
+            public static let class2            = Self(rawValue: 1 << 2)
+            public static let class3            = Self(rawValue: 1 << 3)
+            public static let class4            = Self(rawValue: 1 << 4)
+            public static let maintenanceOnly   = Self(rawValue: 1 << 5)
+            public static let checkAtNextHalt   = Self(rawValue: 1 << 6)
+            public static let checkImmediately  = Self(rawValue: 1 << 7)
 
             public let rawValue: UInt8
 
@@ -50,14 +50,14 @@ public extension UDS {
 
         public struct StatusMask: OptionSet {
 
-            static let testFailed                           = Self(rawValue: 1 << 0)
-            static let testFailedThisOperationCycle         = Self(rawValue: 1 << 1)
-            static let pendingDTC                           = Self(rawValue: 1 << 2)
-            static let confirmedDTC                         = Self(rawValue: 1 << 3)
-            static let testNotCompletedSinceLastClear       = Self(rawValue: 1 << 4)
-            static let testFailedSinceLastClear             = Self(rawValue: 1 << 5)
-            static let testNotCompletedThisOperationCycle   = Self(rawValue: 1 << 6)
-            static let warningIndicatorRequested            = Self(rawValue: 1 << 7)
+            public static let testFailed                           = Self(rawValue: 1 << 0)
+            public static let testFailedThisOperationCycle         = Self(rawValue: 1 << 1)
+            public static let pendingDTC                           = Self(rawValue: 1 << 2)
+            public static let confirmedDTC                         = Self(rawValue: 1 << 3)
+            public static let testNotCompletedSinceLastClear       = Self(rawValue: 1 << 4)
+            public static let testFailedSinceLastClear             = Self(rawValue: 1 << 5)
+            public static let testNotCompletedThisOperationCycle   = Self(rawValue: 1 << 6)
+            public static let warningIndicatorRequested            = Self(rawValue: 1 << 7)
 
             public let rawValue: UInt8
 
