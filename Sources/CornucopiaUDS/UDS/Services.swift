@@ -51,6 +51,7 @@ public extension UDS {
         case diagnosticSessionControl(session: DiagnosticSessionType)
         case ecuReset(type: EcuResetType)
         case readDataByIdentifier(id: DataIdentifier)
+        case readDTCByStatusMask(mask: DTC.StatusMask)
         case requestDownload(compression: Compression, encryption: Encryption, address: TransferAddress, length: TransferLength)
         case requestTransferExit(trpr: DataRecord = [])
         case routineControl(type: RoutineControlType, id: RoutineIdentifier, rcor: DataRecord)
@@ -124,6 +125,9 @@ public extension UDS {
                     let idhi = UInt8(id >> 8 & 0xff)
                     let idlo = UInt8(id & 0xff)
                     return [UDS.ServiceId.readDataByIdentifier, idhi, idlo]
+
+                case .readDTCByStatusMask(let mask):
+                    return [UDS.ServiceId.readDTCInformation, UDS.ReadDTCReportType.reportDTCByStatusMask.rawValue, mask.rawValue]
 
                 case .requestDownload(compression: let compression, encryption: let encryption, address: let address, length: let length):
                     guard compression < 0x10 else { return [] }

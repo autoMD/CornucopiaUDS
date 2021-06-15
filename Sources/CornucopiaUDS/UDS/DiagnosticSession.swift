@@ -70,6 +70,11 @@ public extension UDS {
             self.request(service: .readDataByIdentifier(id: byIdentifier), then: then)
         }
 
+        /// Read DTC
+        public func readDTCByStatusMask(_ mask: DTC.StatusMask, then: @escaping(TypedResultHandler<UDS.DTCResponse>)) {
+            self.request(service: .readDTCByStatusMask(mask: mask), then: then)
+        }
+
         /// Initiate a block transfer (TESTER -> ECU)
         public func requestDownload(compression: UInt8, encryption: UInt8, address: [UInt8], length: [UInt8], then: @escaping(TypedResultHandler<UDS.GenericResponse>)) {
             self.request(service: .requestDownload(compression: compression, encryption: encryption, address: address, length: length), then: then)

@@ -81,7 +81,7 @@ extension UDS {
         public static let kwpRequestRoutineResultsByAddress           : UInt8 = 0x3A
     }
 
-    /// DTC Response: Responses containing one or more diagnostic trouble codes
+    /// OBD2 DTC Response: Responses containing one or more two-byte-diagnostic trouble codes as per SAE2012
     public struct OBD2DTCResponse: ConstructableViaMessage, CustomStringConvertible {
 
         public let dtc: [UDS.OBD2.DTC]
@@ -333,6 +333,23 @@ extension UDS {
         case reportWWHOBDDTCByMaskRecord                        = 0x42
         case reportWWHOBDDTCWithPermanentStatus                 = 0x55
         case reportDTCInformationByDTCReadinessGroupIdentifier  = 0x56
+    }
+
+    /// DTC Response: Responses containing one or more four-byte-diagnostic trouble codes
+    public struct DTCResponse: ConstructableViaMessage, CustomStringConvertible {
+
+        public let statusAvailabilityMask: UDS.DTC.StatusMask
+        public let dtc: [UDS.DTC]
+
+        public init(message: UDS.Message) {
+            guard message.bytes.count > 2 else { fatalError() }
+
+            self.statusAvailabilityMask = UDS.DTC.StatusMask(rawValue: message.bytes[2])
+            let dtcStartOffset = 3
+            self.dtc = message.bytes[dtcStartOffset...].CC_chunked(size: 2).map { UDS.DTC(from: $0) }
+        }
+
+        public var description: String { "DTCResponse: \(dtc)" }
     }
 
     // Service 0x22 – Read Data By Identifier
