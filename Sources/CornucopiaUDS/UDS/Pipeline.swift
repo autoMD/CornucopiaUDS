@@ -24,7 +24,9 @@ public extension UDS {
         }
 
         /// Starts logging by creating a log file in the specified directory.
-        public func startLogging() {
+        /// A given `header` will be written into the file, if supplied.
+        /// Remember to give it a postfix of `\n`, if you want.
+        public func startLogging(header: String = "") {
             self.logQ.async {
                 let dir = FileManager.CC_pathInCachesDirectory(suffix: "dev.cornucopia.CornucopiaUDS")
                 do {
@@ -34,6 +36,9 @@ public extension UDS {
                     self.logFilePath = logFilePath
                     self.logFile = FileHandle(forWritingAtPath: logFilePath)
                     guard self.logFile != nil else { throw NSError(domain: "dev.cornucopia.CornucopiaUDS", code: 7, userInfo: nil) }
+                    if !header.isEmpty, let headerData = header.data(using: .utf8) {
+                        self.logFile?.write(headerData)
+                    }
                 } catch {
                     logger.notice("Can't create log file: \(error)")
                 }
