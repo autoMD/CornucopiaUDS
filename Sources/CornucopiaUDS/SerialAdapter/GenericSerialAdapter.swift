@@ -445,8 +445,11 @@ private extension UDS.GenericSerialAdapter {
     func sendConfigSequence() {
         let cafMode = !(!self.hasAutoSegmentation && self.hasFullFrameNoResponse)
         var sequence: [StringCommand] = []
+        //BUG: At this point of time, the negotiated protocol has not been gathered yet, hence the whole sequence has no effect
+        //TODO: Move .describeProtocolNumeric into the init sequence
         if self.negotiatedProtocol.isCAN {
             sequence += [
+                .readVoltage,
                 .canAutoFormat(on: cafMode),
                 .adaptiveTiming(on: false),
             ]
@@ -470,6 +473,13 @@ private extension UDS.GenericSerialAdapter {
             self.send(command: command) { response in
 
                 switch command {
+
+                    /*
+                    case .readVoltage:
+                        guard case .success(let voltage as String) = response else { return }
+                        print("voltage: \(voltage)")
+                    */
+
                     case .canAutoFormat(let on):
                         guard case .success(let ok as Bool) = response else { return }
                         guard ok else { return }

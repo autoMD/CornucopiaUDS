@@ -56,6 +56,8 @@ public extension UDS {
             }
         }
 
+        public private(set) var batteryVoltage: Measurement<UnitPower>? = nil
+
         public internal(set) var busProtocolEncoder: BusProtocolEncoder? = nil
         public internal(set) var busProtocolDecoder: BusProtocolDecoder? = nil
 
