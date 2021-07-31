@@ -19,7 +19,7 @@ let package: Package = Package(
         // CornucopiaUDS
         .package(url: "https://github.com/Cornucopia-Swift/CornucopiaCore", .branch("master")),
         // ExampleUDS
-        .package(url: "https://github.com/Cornucopia-Swift/CornucopiaStreams", .branch("master")),
+        .package(url: "https://github.com/Cornucopia-Swift/CornucopiaStreams", .branch("ios15-weak-dance")),
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMajor(from: "0.4.3")),
     ],
     targets: [
